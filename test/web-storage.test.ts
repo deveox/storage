@@ -1,5 +1,5 @@
 describe("constructor", () => {
-  it('should create a chain', () => {
+  it('should create a  chain', () => {
     expect(true).toEqual(true)
   })
 })

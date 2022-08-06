@@ -18,10 +18,10 @@ export class WebStorage {
     return WebStorageQuery(`${this.#o.prefix}${this.#o.separator}${key}`, window[this.#type])
   }
 
-  proxy(target: Record<string, unknown>, name = 'proxy') {
+  proxy<T>(target: T, name = 'proxy') {
     const map: Record<string | symbol, boolean> = {}
     const ws = this.key(name)
-    return new Proxy(target, {
+    return new Proxy(target as any, {
       get: (target, prop, receiver) => {
         if (map[prop] || typeof prop === 'symbol') {
           return Reflect.get(target, prop, receiver)
@@ -35,9 +35,8 @@ export class WebStorage {
         }
         return Reflect.set(target, prop, value, receiver)
       }
-    })
+    }) as T
   }
-
 }
 
 

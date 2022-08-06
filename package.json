@@ -1,6 +1,6 @@
 {
   "name": "@deveox/storage",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Formats number, dates and file sizes as human readable strings",
   "main": "./dist/@deveox/storage.cjs",
   "module": "./dist/@deveox/storage.mjs",

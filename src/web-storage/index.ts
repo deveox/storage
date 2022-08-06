@@ -2,7 +2,6 @@ import { defaults, WebStorageOptions } from "./options"
 import { WebStorageQuery } from "./querier"
 
 export type WebStorageType = "localStorage" | "sessionStorage"
-export type WebStorageKey = string | symbol
 
 export class WebStorage {
   #o!: WebStorageOptions
@@ -15,8 +14,8 @@ export class WebStorage {
   config(options: WebStorageOptions) {
     this.#o = options
   }
-  key(...keys: WebStorageKey[]) {
-    return WebStorageQuery([this.#o.prefix, ...keys].join(this.#o.separator), window[this.#type])
+  key(key: string) {
+    return WebStorageQuery(`${this.#o.prefix}${this.#o.separator}${key}`, window[this.#type])
   }
 
   proxy(target: Record<string, unknown>, name = 'proxy') {

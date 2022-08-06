@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Bump version and push tag
+        id: calc_version
+        uses: mathieudutour/github-tag-action@v6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          dry_run: "true"
+      - run: echo ${{ steps.calc_version.outputs.new_version }}
+      - name: Update version
+        run: |
+          echo package.json 
+          jq '.version="${{steps.calc_version.outputs.new_version }}"' package.json > tmp && mv tmp package.json
+          echo package.json
+      - name: Update Changelog
+        run: |
+          echo "${{steps.calc_version.outputs.changelog}}" | cat - CHANGELOG.md > tmp && mv tmp CHANGELOG.md
+      - name: Commit and tag files
+        run: |
+          git config --local user.email "github-actions-bot@noreply.github.com"
+          git config --local user.name "github-actions-bot"
+          git commit -m "[skip ci] release ${{steps.calc_version.outputs.new_tag}}" -a
+          git tag ${{steps.calc_version.outputs.new_tag}}
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.ACCESS_TOKEN }}
+          branch: ${{ github.ref }}
+          tags: true
+
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.calc_version.outputs.new_tag }}
+          name: Release ${{ steps.calc_version.outputs.new_tag }}
+          body: ${{steps.calc_version.outputs.changelog}}
+          token: ${{ secrets.ACCESS_TOKEN }}
